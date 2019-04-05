@@ -1975,6 +1975,14 @@ static inline IData VL_SHIFTR_IIW(int obits,int,int rbits,IData lhs, WDataInP rw
     }
     return VL_CLEAN_II(obits,obits,lhs>>rwp[0]);
 }
+static inline QData VL_SHIFTR_QQW(int obits,int,int rbits,QData lhs, WDataInP rwp) VL_MT_SAFE {
+    for (int i=1; i < VL_WORDS_I(rbits); ++i) {
+        if (VL_UNLIKELY(rwp[i])) {  // Huge shift 1>>32 or more
+            return 0;
+        }
+    }
+    return VL_CLEAN_QQ(obits,obits,lhs>>(static_cast<QData>(rwp[0])));
+}
 
 // EMIT_RULE: VL_SHIFTRS:  oclean=false; lclean=clean, rclean==clean;
 static inline IData VL_SHIFTRS_III(int obits, int lbits, int, IData lhs, IData rhs) VL_PURE {
